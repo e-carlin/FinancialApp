@@ -3,3 +3,6 @@
 # Virtualbox settings -> General -> Advanced  enable bi-directional clipboard
 # Devices -> Insert gues additions CD -> It should open a prompt click run and enter your password
 # Restart
+# Eject CD
+
+sudo apt-get install git
