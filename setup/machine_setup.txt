@@ -1,0 +1,5 @@
+# Use Ubuntu 16.04.03 LTS https://www.ubuntu.com/download/desktop
+# When setting up use keyboard English US Macintosh
+# Virtualbox settings -> General -> Advanced  enable bi-directional clipboard
+# Devices -> Insert gues additions CD -> It should open a prompt click run and enter your password
+# Restart
