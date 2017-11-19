@@ -1,29 +1,6 @@
 from flask import Flask
 from flask_restful import reqparse, abort, Api, Resource
-import os
-import psycopg2
-import plaid
 
-db_hostname = 'localhost'
-db_username = os.environ['APP_DB_USERNAME']
-db_password = os.environ['APP_DB_PASSWORD']
-db_name = os.environ['APP_DB_NAME']
-PLAID_CLIENT_ID = os.getenv('PLAID_CLIENT_ID')
-PLAID_SECRET = os.getenv('PLAID_SECRET')
-PLAID_PUBLIC_KEY = os.getenv('PLAID_PUBLIC_KEY')
-PLAID_ENV = os.getenv('PLAID_ENV')
-
-def doQuery( conn ) :
-    cur = conn.cursor()
-
-    cur.execute( "SELECT category_id, amount FROM transactions" )
-
-    for category, amount in cur.fetchall() :
-        print(category, amount)
-
-myConnection = psycopg2.connect( host=db_hostname, user=db_username, password=db_password, dbname=db_name )
-doQuery( myConnection )
-myConnection.close()
 
 
 app = Flask(__name__)
