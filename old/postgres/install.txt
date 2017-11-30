@@ -1,0 +1,6 @@
+https://www.codementor.io/devops/tutorial/getting-started-postgresql-server-mac-osx
+
+brew install postgres
+brew link
+initdb
+psql postgres
