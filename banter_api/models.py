@@ -1,7 +1,8 @@
 import jwt
 import datetime
 
-from . import app, db, bcrypt
+from .extensions import bcrypt
+from .extensions import db
 
 
 class User(db.Model):
@@ -14,11 +15,15 @@ class User(db.Model):
     registered_on = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, email, password):
+        print("&&&&& IN CREATE USER &&&&&&&")
         self.email = email
+        print("&&&&&&&&& BEFORE PASSWORD &&&&&&&&&&&")
         self.password = bcrypt.generate_password_hash(
-            password, app.config.get('BCRYPT_LOG_ROUNDS')
+            password, 12 # TODO: This once read app.config.get('BCRYPT_LOG_ROUNDS') but there was the cir import issue
         ).decode()
+        print("&&&&&&&& AFTER PASSWORD &&&&&&&&&&&&")
         self.registered_on = datetime.datetime.now()
+        print("&&&&&&& DONE WITH INIT &&&&&&&&&")
 
     def encode_auth_token(self, user_id):
         """
@@ -33,7 +38,7 @@ class User(db.Model):
             }
             return jwt.encode(
                 payload,
-                app.config.get('SECRET_KEY'),
+                'my super secret key', # TODO: This once read app.config.get('SECRET_KEY'),
                 algorithm='HS256'
             )
         except Exception as e:
@@ -47,7 +52,7 @@ class User(db.Model):
         :return: integer|string
         """
         try:
-            payload = jwt.decode(auth_token, app.config.get('SECRET_KEY'))
+            payload = jwt.decode(auth_token, 'my super secret key')# TODO: This once read app.config.get('SECRET_KEY'))
             is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
             if is_blacklisted_token:
                 return 'Token blacklisted. Please log in again.'

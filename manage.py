@@ -3,7 +3,7 @@
 
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from banter_api.api import app, db
+from banter_api.app import app, db
 
 migrate = Migrate(app, db)
 manager = Manager(app)
