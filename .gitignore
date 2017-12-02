@@ -153,3 +153,6 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+#direnv
+.direnv/
+.envrc

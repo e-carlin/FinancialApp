@@ -6,7 +6,7 @@ database_name = os.getenv('BANTER_DB_NAME', 'banter')
 
 class BaseConfig:
     """Base configuration."""
-    SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious') # TODO: The secret key we are currently using isn't actually very good use the method described here https://realpython.com/blog/python/token-based-authentication-with-flask/
+    SECRET_KEY = os.getenv('BANTER_SECRET_KEY', 'my_precious') # TODO: The secret key we are currently using isn't actually very good use the method described here https://realpython.com/blog/python/token-based-authentication-with-flask/
     DEBUG = False
     BCRYPT_LOG_ROUNDS = 13
     SQLALCHEMY_TRACK_MODIFICATIONS = False
