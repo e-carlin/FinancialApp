@@ -28,6 +28,7 @@ from .extensions import db, bcrypt
 def create_app():
     app = Flask(__name__)
     api = Api(app)
+    app.debug = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # TODO: This used to live in config.py
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://banterapiuser:@localhost/banter'  # TODO: This used to live in config.py
     register_extensions(app)
