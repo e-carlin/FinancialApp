@@ -9,9 +9,9 @@ from banter_api.extensions import db
 
 class PlaidResource(Resource):
     def post(self):
-        current_app.logger.info("Exchanging Plaid public token for an access token.")
+        current_app.logger.info("Exchanging Plaid public token for an access token and item id.")
 
-        current_app.logger.debug("Converting raw request into json dict: {}".format(request.get_json))
+        current_app.logger.debug("Converting raw request into json dict: {}".format(request.get_json()))
         request_as_dict = json.loads(request.get_json())
 
         try:
@@ -49,7 +49,7 @@ class PlaidResource(Resource):
         # # print 'item ID: ' + exchange_response['item_id']
         # #
         # # access_token = exchange_response['access_token']
-        current_app.logger.debug("Succesfully exchanged public token with Plaid!")
+        current_app.logger.info("Succesfully exchanged Plaid public token for an access token and item id!")
         responseObject = {
             'status' : 'success',
             'message' : 'Successfully exchanged public token with Plaid.'
