@@ -17,7 +17,10 @@ class DevelopmentConfig(BaseConfig):
     DEBUG = True
     BCRYPT_LOG_ROUNDS = 4
     SQLALCHEMY_DATABASE_URI = postgres_local_base + database_name
-
+    PLAID_CLIENT_ID = os.getenv('PLAID_CLIENT_ID')
+    PLAID_SECRET_KEY = os.getenv('PLAID_SECRET_KEY')
+    PLAID_PUBLIC_KEY = os.getenv('PLAID_PUBLIC_KEY')
+    PLAID_ENV = 'sandbox'
 
 class TestingConfig(BaseConfig):
     """Testing configuration."""
