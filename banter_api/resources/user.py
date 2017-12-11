@@ -3,13 +3,14 @@ from flask_restful import Resource
 from flask import current_app
 
 from banter_api.extensions import db
-from banter_api.models import User
+from banter_api.models.user import User, EmailMalformedError, PasswordEmptyError
 
 class RegisterResource(Resource):
     def post(self):
         # get the post data
         post_data = request.get_json()
-        current_app.logger.info('Trying to register user {}'.format(post_data.get('email')))
+        current_app.logger.info('Trying to register user: {}'.format(post_data.get('email')))
+        current_app.logger.debug("Full request body was: '{}'".format(post_data))
         # check if user already exists
         user = User.query.filter_by(email=post_data.get('email')).first()
         if not user:
@@ -25,24 +26,38 @@ class RegisterResource(Resource):
                 current_app.logger.debug("Saved user to db.")
                 # generate the auth token
                 auth_token = user.encode_auth_token(user.id)
-                current_app.logger.debug("Created auth token {} ".format(auth_token.decode()))
+                current_app.logger.debug("Created auth token: {} ".format(auth_token.decode()))
                 responseObject = {
                     'status': 'success',
                     'message': 'Successfully registered.',
                     'auth_token': auth_token.decode()
                 }
                 return responseObject, 201
-            except Exception as e:
-                current_app.logger.debug("Error creating user {}".format(e))
+            except EmailMalformedError as e:
+                current_app.logger.error("Supplied email was malformed: {}".format(e))
                 responseObject = {
                     'status': 'fail',
-                    'message': 'Some error occurred. Please try again.'
+                    'message': "Error registering user: {}".format(e)
                 }
-                return responseObject, 401
+                return responseObject, 400
+            except PasswordEmptyError as e:
+                current_app.logger.error("Supplied password was malformed: {}".format(e))
+                responseObject = {
+                    'status': 'fail',
+                    'message': "Error registering user: {}".format(e)
+                }
+                return responseObject, 400
+            except Exception as e:
+                current_app.logger.error("Unhandled error registering user: {}".format(e))
+                responseObject = {
+                    'status': 'fail',
+                    'message': 'There was an error registering. Please try again.'
+                }
+                return responseObject, 500
         else:
             current_app.logger.info("The email {} already exists in the db under user {}".format(post_data.get('email') , user))
             responseObject = {
                 'status': 'fail',
-                'message': 'User already exists. Please Log in.',
+                'message': 'Sorry, the email is already taken. Please try another or log in.',
             }
-            return responseObject, 201 # TODO: Should this be 201?
+            return responseObject, 409
