@@ -11,9 +11,9 @@ from banter_api.models.institution import Institution
 class PlaidResource(Resource):
     def post(self):
         current_app.logger.info("Exchanging Plaid public token for an access token and item id.")
-        current_app.logger.debug("Converting raw request into json dict: '{}'".format(request.get_json()))
 
-        request_as_dict = json.loads(request.get_json())
+        request_as_dict = request.get_json()
+        current_app.logger.debug("Converting raw request into json dict: '{}'".format(request_as_dict))
 
         try:
             current_app.logger.debug("Creating Plaid Client")
@@ -29,12 +29,12 @@ class PlaidResource(Resource):
                 'message': 'Error connecting to Plaid'
             }
             return responseObject, 500
-        #
-        #
+
         try:
-            current_app.logger.debug("Exchanging plaid public token '{}' for an access token"
-                                     .format(request_as_dict['public_token']))
             public_token = request_as_dict['public_token']
+            current_app.logger.debug("Exchanging plaid public token '{}' for an access token"
+                                     .format(public_token))
+
             exchange_response = client.Item.public_token.exchange(public_token)
             current_app.logger.debug("Received response from Plaid '{}'".format(exchange_response))
         except Exception as e:
@@ -46,14 +46,16 @@ class PlaidResource(Resource):
             return responseObject, 500
 
         current_app.logger.info("Succesfully exchanged Plaid public token for an access token and item id!")
-        current_app.logger.debug("The plaid link_session_id is '{}'".format(request_as_dict['link_session_id']))
-        institution = Institution.query.filter_by(plaid_institution_id=request_as_dict['institution']['institution_id']).first()
+        current_app.logger.debug("The plaid link_session_id is '{}'".format(request_as_dict['metadata']['link_session_id']))
+
+        plaid_institution_id = request_as_dict['metadata']['institution']['institution_id']
+        institution = Institution.query.filter_by(plaid_institution_id=plaid_institution_id).first()
         if not institution:
-            current_app.logger.debug("Insitution '{}' doesn't already exist in db. Creating institution...".format(request_as_dict['institution']))
+            current_app.logger.debug("Insitution '{}' doesn't already exist in db. Creating institution...".format(request_as_dict['metadata']['institution']))
             try:
                 institution = Institution(
-                    plaid_institution_id=request_as_dict['institution']['institution_id'],
-                    name=request_as_dict['institution']['name']
+                    plaid_institution_id=plaid_institution_id,
+                    name=request_as_dict['metadata']['institution']['name']
                 )
                 db.session.add(institution)
                 db.session.commit()
@@ -69,7 +71,7 @@ class PlaidResource(Resource):
         else:
             current_app.logger.debug("Institution found '{}'".format(institution))
 
-        current_app.logger.debug("Saving accounts '{}' to db.".format(request_as_dict['accounts']))
+        current_app.logger.debug("Saving accounts '{}' to db.".format(request_as_dict['metadata']['accounts']))
         # TODO: Save the account info
         response_object = {
             'status' : 'success',
