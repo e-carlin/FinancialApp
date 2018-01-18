@@ -1,5 +1,0 @@
-{'message': 'Successfully registered user', 'code' : '2001'}
-{'message': 'Registration email malformed', 'code' : '4000'}
-{'message': 'Registration email already taken', 'code' : '4002'}
-{'message': 'Registration password malformed', 'code' : '4001'}
-{'message': 'Unhandled user creation error.', 'code' : '5000'}

@@ -3,10 +3,10 @@ from plaid.errors import APIError, ItemError
 from flask import request, make_response, jsonify
 from flask_restful import Resource
 from flask import current_app
-import json
 
 from banter_api.extensions import db
 from banter_api.models.institution import Institution
+from banter_api.models.account import Account
 
 class PlaidResource(Resource):
     def post(self):
@@ -25,8 +25,9 @@ class PlaidResource(Resource):
             current_app.logger.error("Error creating Plaid client: '{}'. "
                                      "This likely means that the client constructor inputs were bad.".format(e))
             responseObject = {
-                'status': 'fail',
-                'message': 'Error connecting to Plaid'
+                'status': '500',
+                'message': 'Error connecting to Plaid',
+                'code' : '5001'
             }
             return responseObject, 500
 
@@ -40,10 +41,11 @@ class PlaidResource(Resource):
         except Exception as e:
             current_app.logger.error("Error exchanging public token with Plaid. This probably means the public token was malformed.".format(public_token))
             responseObject = {
-                'status' : 'fail',
-                'message' : 'Error exchanging public token with Plaid. This probably means the public token was malformed'
+                'status' : '400',
+                'message' : 'Error exchanging public token with Plaid. This probably means the public token was malformed',
+                'code' : '4002'
             }
-            return responseObject, 500
+            return responseObject, 400
 
         current_app.logger.info("Succesfully exchanged Plaid public token for an access token and item id!")
         current_app.logger.debug("The plaid link_session_id is '{}'".format(request_as_dict['metadata']['link_session_id']))
@@ -63,18 +65,37 @@ class PlaidResource(Resource):
             except Exception as e:
                 current_app.logger.error("Error creating institution '{}'".format(institution))
                 response_object = {
-                    'status' : 'fail',
-                    'message' : 'There was an error saving the institution. Please try again.'
+                    'status' : '500',
+                    'message' : 'There was an error saving the institution. Please try again.',
+                    'code' : '5002'
                 }
                 return response_object, 500
 
         else:
             current_app.logger.debug("Institution found '{}'".format(institution))
 
-        current_app.logger.debug("Saving accounts '{}' to db.".format(request_as_dict['metadata']['accounts']))
-        # TODO: Save the account info
+        accounts = request_as_dict['metadata']['accounts']
+        current_app.logger.debug("Saving accounts '{}' to db.".format(accounts))
+
+        for accountDetails in accounts:
+            current_app.logger.debug("Trying to save account {}.".format(accountDetails))
+            plaid_account_id = accountDetails['id']
+            if not Account.query.filter_by(plaid_account_id=plaid_account_id).first(): # If an account with this id is *not* already found
+                try:
+                    account = Account(
+                        plaid_account_id = plaid_account_id,
+                        name = accountDetails["name"]
+                    )
+                    db.session.add(account)
+                    db.session.commit()
+                    current_app.logger.info("Saved account {}".format(accountDetails))
+                except Exception as e:
+                    current_app.logger.error("Error saving account {}. \n {}".format(accountDetails, e)) # TODO: Should this be str(e)
+
+
         response_object = {
-            'status' : 'success',
-            'message' : 'Successfully exchanged public token with Plaid.'
+            'status' : '200',
+            'message' : 'Scucess exchanging public token.',
+            'code' : '2002'
         }
         return response_object, 200

@@ -1,0 +1,44 @@
+{
+  "internal_codes": {
+    "models_user": [
+      {
+        "message": "Success registering user.",
+        "code": "2001"
+      },
+      {
+        "message": "Error registering user. Email malformed.",
+        "code": "4000"
+      },
+      {
+        "message": "Error registering user. Email already taken.",
+        "code": "4002"
+      },
+      {
+        "message": "Error registering user. Password malformed.",
+        "code": "4001"
+      },
+      {
+        "message": "Error creating user.",
+        "code": "5000"
+      }
+    ],
+    "resources__plaid": [
+      {
+        "message": "Error creating Plaid client.",
+        "code": "5001"
+      },
+      {
+        "message": "Error exchanging public token. This probably means it was malformed.",
+        "code": "4002"
+      },
+      {
+        "message": "Error saving institution.",
+        "code": "5002"
+      }
+      {
+        "message" : "Scucess exchanging public token."
+        "code" : "2002"
+      }
+    ]
+  }
+}

@@ -1,1 +1,4 @@
-Generic single-database configuration.
+# How to generate a migration
+* Create new model (You might have to add it to a resource that is being added to api. Not sure)
+* $ python manage.py db migrate
+* $ python manage.py db upgrade

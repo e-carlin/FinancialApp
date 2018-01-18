@@ -31,37 +31,37 @@ class RegisterResource(Resource):
                     'status': '201',
                     'message': 'Successfully registered user',
                     'auth_token': auth_token.decode(),
-                    'code': '2001'
+                    'internal_code': '2001'
                 }
                 return responseObject, 201
             except EmailMalformedError as e:
                 current_app.logger.error("Supplied email was malformed: {}".format(e))
                 responseObject = {
-                    'status': 'fail',
+                    'status': '400',
                     'message': "Error registering user, {}".format(e),
-                    'code': '4000'
+                    'internal_code': '4000'
                 }
                 return responseObject, 400
             except PasswordEmptyError as e:
                 current_app.logger.error("Supplied password was malformed, {}".format(e))
                 responseObject = {
-                    'status': 'fail',
+                    'status': '400',
                     'message': "Error registering user, {}".format(e),
-                    'code' : '4001'
+                    'internal_code' : '4001'
                 }
                 return responseObject, 400
             except Exception as e:
                 current_app.logger.error("Unhandled error registering user, {}".format(e))
                 responseObject = {
-                    'status': 'fail',
+                    'status': '500',
                     'message': 'There was an error registering. Please try again.',
-                    'code' : '5000'
+                    'internal_code' : '5000'
                 }
                 return responseObject, 500
         else:
             current_app.logger.info("The email {} already exists in the db under user {}".format(post_data.get('email') , user))
             responseObject = {
-                'status': 'fail',
+                'status': '409',
                 'message': 'Sorry, the email is already taken. Please try another or log in.',
                 "code" : "4002"
             }
