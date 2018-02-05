@@ -156,3 +156,6 @@ fabric.properties
 #direnv
 .direnv/
 .envrc
+
+# vscode
+.vscode

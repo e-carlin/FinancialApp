@@ -10,7 +10,7 @@ from banter_api.resources._plaid import PlaidResource
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(os.environ['BANTER_SETTINGS'])
+    app.config.from_object('banter_api.config.DevelopmentConfig') #TODO: Read this from env var
     CORS(app)
 
     register_extensions(app)

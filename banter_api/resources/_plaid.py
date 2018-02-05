@@ -39,7 +39,8 @@ class PlaidResource(Resource):
             exchange_response = client.Item.public_token.exchange(public_token)
             current_app.logger.debug("Received response from Plaid '{}'".format(exchange_response))
         except Exception as e:
-            current_app.logger.error("Error exchanging public token with Plaid. This probably means the public token was malformed.".format(public_token))
+            current_app.logger.error("Error exchanging public token with Plaid. This probably means the public token was malformed.")
+            current_app.logger.error(e)
             responseObject = {
                 'status' : '400',
                 'message' : 'Error exchanging public token with Plaid. This probably means the public token was malformed',
