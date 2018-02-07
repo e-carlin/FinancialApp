@@ -39,8 +39,7 @@ class PlaidResource(Resource):
             exchange_response = client.Item.public_token.exchange(public_token)
             current_app.logger.debug("Received response from Plaid '{}'".format(exchange_response))
         except Exception as e:
-            current_app.logger.error("Error exchanging public token with Plaid. This probably means the public token was malformed.")
-            current_app.logger.error(e)
+            current_app.logger.error("Error exchanging public token with Plaid. This probably means the public token was malformed. Exception: "+str(e)) 
             responseObject = {
                 'status' : '400',
                 'message' : 'Error exchanging public token with Plaid. This probably means the public token was malformed',
@@ -49,16 +48,16 @@ class PlaidResource(Resource):
             return responseObject, 400
 
         current_app.logger.info("Succesfully exchanged Plaid public token for an access token and item id!")
-        current_app.logger.debug("The plaid link_session_id is '{}'".format(request_as_dict['metadata']['link_session_id']))
+        current_app.logger.debug("The plaid link_session_id is '{}'".format(request_as_dict['link_session_id']))
 
-        plaid_institution_id = request_as_dict['metadata']['institution']['institution_id']
+        plaid_institution_id = request_as_dict['institution']['institution_id']
         institution = Institution.query.filter_by(plaid_institution_id=plaid_institution_id).first()
         if not institution:
-            current_app.logger.debug("Insitution '{}' doesn't already exist in db. Creating institution...".format(request_as_dict['metadata']['institution']))
+            current_app.logger.debug("Insitution '{}' doesn't already exist in db. Creating institution...".format(request_as_dict['institution']))
             try:
                 institution = Institution(
                     plaid_institution_id=plaid_institution_id,
-                    name=request_as_dict['metadata']['institution']['name']
+                    name=request_as_dict['institution']['name']
                 )
                 db.session.add(institution)
                 db.session.commit()
@@ -75,7 +74,7 @@ class PlaidResource(Resource):
         else:
             current_app.logger.debug("Institution found '{}'".format(institution))
 
-        accounts = request_as_dict['metadata']['accounts']
+        accounts = request_as_dict['accounts']
         current_app.logger.debug("Saving accounts '{}' to db.".format(accounts))
 
         for accountDetails in accounts:
