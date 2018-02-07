@@ -1,6 +1,6 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
-postgres_local_base = 'postgresql://banterapiuser:@localhost/' # TODO: Change banterapiuser to be imported from settings
+postgres_local_base = 'postgresql://banterapiuser:@localhost:5433/' # TODO: Change banterapiuser to be imported from settings
 database_name = os.getenv('BANTER_DB_NAME', 'banter')
 
 

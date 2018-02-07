@@ -3,10 +3,29 @@ from plaid.errors import APIError, ItemError
 from flask import request, make_response, jsonify
 from flask_restful import Resource, abort
 from flask import current_app
-
 from banter_api.extensions import db
-from banter_api.models.institution import Institution
-from banter_api.models.account import Account
+  
+class PlaidResource(Resource):
+    def post(self):
+        current_app.logger.info("Exchanging Plaid public token for an access token and item id.")
+
+        request_as_dict = get_request_as_dict(request)
+
+        public_token = get_public_token_from_request(request_as_dict)
+
+        exchange_response = exchange_public_token(public_token)
+
+        current_app.logger.debug("The plaid link_session_id is '{}'".format(request_as_dict['link_session_id']))
+
+        # save_exchange_response_data(exchange_response) # TODO
+
+        response_object = {
+            'status' : '200',
+            'message' : 'Scucess exchanging public token.',
+            'code' : '2002'
+        }
+        return response_object, 200
+
 
 def get_plaid_client():
     try:
@@ -46,10 +65,10 @@ def exchange_public_token(public_token):
         current_app.logger.info("Succesfully exchanged Plaid public token for an access token and item id!")
         return exchange_response
     except Exception as e:
-        current_app.logger.error("Error exchanging public token with Plaid. This probably means the public token was malformed. Exception: "+str(e)) 
+        current_app.logger.error("Error exchanging public token with Plaid. Exception: "+str(e)) 
         response_object = {
                 'status' : '400',
-                'message' : 'Error exchanging public token with Plaid. This probably means the public token was malformed',
+                'message' : 'Error exchanging public token with Plaid',
                 'code' : '4002'
             }
         abort(400, message=response_object)
@@ -106,27 +125,6 @@ def save_exchange_response_data(data):
                 current_app.logger.info("Saved account {}".format(accountDetails))
             except Exception as e:
                 current_app.logger.error("Error saving account {}. \n {}".format(accountDetails, e)) # TODO: Should this be str(e)
-    
-
-class PlaidResource(Resource):
-    def post(self):
-        current_app.logger.info("Exchanging Plaid public token for an access token and item id.")
-
-        request_as_dict = get_request_as_dict(request)
-
-        public_token = get_public_token_from_request(request_as_dict)
-
-        exchange_response = exchange_public_token(public_token)
-
-        current_app.logger.debug("The plaid link_session_id is '{}'".format(request_as_dict['link_session_id']))
-
-        # save_exchange_response_data(exchange_response) # TODO
-
-        response_object = {
-            'status' : '200',
-            'message' : 'Scucess exchanging public token.',
-            'code' : '2002'
-        }
-        return response_object, 200
+  
 
         

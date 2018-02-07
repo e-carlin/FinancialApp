@@ -4,7 +4,6 @@ from flask_restful import Api
 from flask_cors import CORS
 
 from .extensions import db, bcrypt
-from banter_api.resources.user import RegisterResource
 from banter_api.resources._plaid import PlaidResource
 
 
@@ -24,5 +23,4 @@ def register_extensions(app):
     bcrypt.init_app(app)
 
 def add_resources(api):
-    api.add_resource(RegisterResource, '/user/register')
     api.add_resource(PlaidResource, '/exchange_plaid_public_token')

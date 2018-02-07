@@ -6,7 +6,6 @@ from flask_migrate import Migrate, MigrateCommand
 from banter_api.app import create_app
 from banter_api.extensions import db
 from banter_api.models.user import User
-from banter_api.models.institution import Institution
 
 app = create_app()
 
