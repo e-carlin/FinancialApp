@@ -4,8 +4,30 @@ from flask import request, make_response, jsonify
 from flask_restful import Resource, abort
 from flask import current_app
 from banter_api.extensions import db
+
+from functools import wraps
+def verify_jwt(f):
+    @wraps(f)
+    def decorated_function(*args, **kws):
+        current_app.logger.debug("REQ: {}".format(request.headers))
+        if not 'Authorization' in request.headers:
+            abort(401)
+
+        user = None
+        data = request.headers['Authorization'].encode('ascii','ignore')
+        token = str.replace(str(data), 'Bearer ','')
+        try:
+            user = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])['sub']
+        except:
+            abort(401)
+
+        return f(user, *args, **kws)            
+    return decorated_function
+     
+
   
 class PlaidResource(Resource):
+    @verify_jwt
     def post(self):
         current_app.logger.info("Exchanging Plaid public token for an access token and item id.")
 
