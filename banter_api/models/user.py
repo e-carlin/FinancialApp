@@ -8,6 +8,8 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     cognito_id = db.Column(db.String(255), unique=True, nullable=False)
+    registered_on = db.Column(db.Date, nullable=False)
+    last_login = db.Column(db.Date)
 
     def __init__(self, cognito_id):
         self.cognito_id = cognito_id
