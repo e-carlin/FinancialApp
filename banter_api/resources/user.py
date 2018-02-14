@@ -6,19 +6,18 @@ from sqlalchemy import exc
 from banter_api.models.user import User
 
 class UserSchema(Schema):
-    cognito_id = fields.Str(required=True,
-        error_messages={"required" : "cognito_id is a required field"}
-    )
     email = fields.Email(required=True,
         error_messages={'required' : 'email is a required field'}
     )
 
 class UserResource(Resource):
+    #TODO: We should probably implement some sort of security to only accept requests
+    # from our apps
     def post(self):
         """ Creates a new user"""
         data = parse_request(request)
 
-        save_user(data['cognito_id'], data['email'])
+        save_user(data['email'])
 
         response_object = {
             'status' : '200',
@@ -28,17 +27,17 @@ class UserResource(Resource):
         return response_object, 200
 
 
-def save_user(cognito_id, email):
+def save_user(email):
     current_app.logger.debug("Trying to save newly registered user to db")
     try:
-        User.save_user(cognito_id, email)
+        User.save_user(email)
     except Exception as e:
         current_app.logger.error("Could not save newly registered user to db. Exception: {}".format(e))
         if type(e) is exc.IntegrityError:
             #IntegrityError means one of the integrity constraints (ie NOT NULL, UNIQUE,...) failed
             response_object = {
                 'status' : '400',
-                'message' : 'An integrity constraint failed when trying to save the newly registered user to the db. Please make sure the cognito_id and email are unique',
+                'message' : 'An integrity constraint failed when trying to save the newly registered user to the db. Please make sure the email is unique',
                 'code' : '???' #TODO
             }
             abort(400, message=response_object)

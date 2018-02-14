@@ -8,24 +8,22 @@ class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    cognito_id = db.Column(db.String(255), unique=True, nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     registered_on = db.Column(db.DateTime(timezone=True), nullable=False)
     last_login = db.Column(db.DateTime(timezone=True))
 
-    def __init__(self, cognito_id, email):
-        self.cognito_id = cognito_id
+    def __init__(self, email):
         self.email = email
         # TODO: We are storing registered_on and last_login as UTC timestamps. So we lose what timezone events actually ocurred in
         # This is fine for MVP but will need to think about it more in the future.
         self.registered_on = datetime.now(timezone.utc)
 
     def __repr__(self):
-        return '[id: {}, cognito_id: {}'.format(self.id, self.cognito_id)
+        return '[id: {}, email: {}'.format(self.id, self.email)
 
     @staticmethod
-    def save_user(cognito_id, email):
-        user = User(cognito_id, email)
+    def save_user(email):
+        user = User(email)
         db.session.add(user)
         db.session.commit()
 

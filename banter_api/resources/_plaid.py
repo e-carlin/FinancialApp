@@ -19,7 +19,12 @@ def verify_jwt(f):
         try:
             user = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])['sub']
         except:
-            abort(401)
+            response_object = {
+            'status' : '401',
+            'message' : 'Authorization failed',
+            'code' : '???' #TODO:
+        }
+            abort(401, message=response_object)
 
         return f(user, *args, **kws)            
     return decorated_function
