@@ -51,21 +51,14 @@ def save_user(cognito_id, email):
                 'message' : 'There was a fatal error saving the user to the db.',
                 'code' : '???' #TODO
             }
-            abort(500, message=response_object)
-        # response_object = {
-        #     'status' : '500',
-        #     'message' : 'There was trouble saving the user to the db. This could mean that there was already a user with the same email found in the db.',
-        #     'code' : '???' #TODO
-        # }
-        # abort(500, message=response_object)        
+            abort(500, message=response_object)       
 
 def parse_request(request):
     try:
         schema = UserSchema()
         data = schema.loads(request.data)
         current_app.logger.debug("Data is: {}".format(data))
-
-        current_app.logger.debug("type is: {}".format(bool(data[1])))
+        
         #TODO: This is a big time hack that has to be done unless marhmallow is intalled with the --pre flag.
         # If it is installed with --pre then the ValidationError exception below will catch this
         if data[1]:

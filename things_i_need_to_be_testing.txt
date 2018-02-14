@@ -1,0 +1,4 @@
+- User post:
+    - marshmallow schema load is actually working and validating required fields
+    - unique constraints on save user are working and we are properly handling errors
+    
