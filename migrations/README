@@ -1,7 +1,7 @@
 # How to generate a migration
 * Create new model (You might have to add it to a resource that is being added to api. Not sure)
-* $ python3 manage.py db migrate
-* $ python3 manage.py db upgrade
+python manage.py db migrate
+python manage.py db upgrade
 
 
 Windows: psql -p 5433 -U postgres
