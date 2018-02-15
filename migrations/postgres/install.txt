@@ -1,6 +1,11 @@
 https://www.codementor.io/devops/tutorial/getting-started-postgresql-server-mac-osx
 
+#Mac
 brew install postgres
 brew link
 initdb
 psql postgres
+
+#Ubuntu
+sudo apt-get update
+sudo apt-get install postgresql postgresql-contrib
