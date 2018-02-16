@@ -3,46 +3,58 @@ from plaid.errors import APIError, ItemError
 from flask import request, make_response, jsonify
 from flask_restful import Resource, abort
 from flask import current_app
+from marshmallow import Schema, fields, ValidationError
 from banter_api.extensions import db
+from banter_api.resources.common.parseRequest import parse_request
 
-from functools import wraps
-def verify_jwt(f):
-    @wraps(f)
-    def decorated_function(*args, **kws):
-        current_app.logger.debug("REQ: {}".format(request.headers))
-        if not 'Authorization' in request.headers:
-            abort(401)
+# from functools import wraps
+# def verify_jwt(f):
+#     @wraps(f)
+#     def decorated_function(*args, **kws):
+#         current_app.logger.debug("REQ: {}".format(request.headers))
+#         if not 'Authorization' in request.headers:
+#             abort(401)
 
-        user = None
-        data = request.headers['Authorization'].encode('ascii','ignore')
-        token = str.replace(str(data), 'Bearer ','')
-        try:
-            user = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])['sub']
-        except:
-            response_object = {
-            'status' : '401',
-            'message' : 'Authorization failed',
-            'code' : '???' #TODO:
-        }
-            abort(401, message=response_object)
+#         user = None
+#         data = request.headers['Authorization'].encode('ascii','ignore')
+#         token = str.replace(str(data), 'Bearer ','')
+#         try:
+#             user = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])['sub']
+#         except:
+#             response_object = {
+#             'status' : '401',
+#             'message' : 'Authorization failed',
+#             'code' : '???' #TODO:
+#         }
+#             abort(401, message=response_object)
 
-        return f(user, *args, **kws)            
-    return decorated_function
+#         return f(user, *args, **kws)            
+#     return decorated_function
      
 
+class AddAccountSchema(Schema):
+    public_token = fields.String(required=True,
+        error_messages={'required' : 'public_token is a required field'}
+    )
+    account_id = fields.String(required=True,
+        error_messages={'required' : 'account_id is a required field'}
+    )
+    link_session_id = fields.String(required=True,
+        error_messages={'required' : 'link_session_id is a required field'}
+    )
+    #TODO: Finish filling these out
   
-class PlaidResource(Resource):
-    @verify_jwt
+class AddAccountResource(Resource):
+    # @verify_jwt
     def post(self):
-        current_app.logger.info("Exchanging Plaid public token for an access token and item id.")
+        current_app.logger.info("Adding account information returned from Plaid.")
 
-        request_as_dict = get_request_as_dict(request)
+        data = parse_request(request, AddAccountSchema)
+        current_app.logger.debug("Received this data from Plaid link: "+str(data))
 
-        public_token = get_public_token_from_request(request_as_dict)
+        current_app.logger.info("The plaid link_session_id is '{}'".format(data['link_session_id'])) # Plaid docs recommend logging this
+        exchange_response = exchange_public_token(data['public_token'])
 
-        exchange_response = exchange_public_token(public_token)
-
-        current_app.logger.debug("The plaid link_session_id is '{}'".format(request_as_dict['link_session_id']))
 
         # save_exchange_response_data(exchange_response) # TODO
 
@@ -71,17 +83,6 @@ def get_plaid_client():
         abort(500, message=response_object)
     return client
 
-def get_public_token_from_request(request):
-    if('public_token' in request):
-        return request['public_token']
-    else:
-        current_app.logger.error("Hello {}".format(request))
-        response_object = {
-                'status' : '400',
-                'message' : 'Request malformed. plublic_token not found in body.',
-                'code' : '???' # TODO: do
-            }
-        abort(400, message=response_object)
 
 def exchange_public_token(public_token):
     current_app.logger.debug("Exchanging plaid public token '{}' for an access token".format(public_token))

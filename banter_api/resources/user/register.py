@@ -1,21 +1,21 @@
 from flask_restful import Resource, abort
 from flask import request, current_app
-from marshmallow import Schema, fields, ValidationError, pprint
-from json import JSONDecodeError
+from marshmallow import Schema, fields
 from sqlalchemy import exc
 from banter_api.models.user import User
+from banter_api.resources.common.parseRequest import parse_request
 
-class UserSchema(Schema):
+class RegisterUserSchema(Schema):
     email = fields.Email(required=True,
         error_messages={'required' : 'email is a required field'}
     )
 
-class UserResource(Resource):
+class RegisterUserResource(Resource):
     #TODO: We should probably implement some sort of security to only accept requests
     # from our apps
     def post(self):
         """ Creates a new user"""
-        data = parse_request(request)
+        data = parse_request(request, RegisterUserSchema)
 
         save_user(data['email'])
 
@@ -50,28 +50,3 @@ def save_user(email):
             'code' : '???' #TODO
         }
         abort(500, message=response_object)       
-
-def parse_request(request):
-    try:
-        schema = UserSchema()
-        data = schema.loads(request.data)
-        current_app.logger.debug("Data is: {}".format(data))
-        return data
-    except ValidationError as err:
-        current_app.logger.debug("ValidationError thrown when parsing request. Error: {}".format(err))
-        
-        response_object = {
-            'status' : '400',
-            'message' : 'Schema validation for your request failed. Failures: {}'.format(err.messages),
-            'code' : '?????' #TODO: implement code
-        }
-        abort(400, message=response_object)
-    except JSONDecodeError as err:
-        current_app.logger.debug("JSONDevodeErrror thrown when parsing request. Error: {}".format(err))
-
-        response_object = {
-            'status' : '400',
-            'message' : 'There was an error decoding the request JSON. Please make sure the supplied JSON is valid',
-            'code' : '?????' #TODO: implement code
-        }
-        abort(400, message=response_object)
