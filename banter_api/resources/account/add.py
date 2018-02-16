@@ -33,14 +33,29 @@ from banter_api.resources.common.parseRequest import parse_request
      
 
 class AddAccountSchema(Schema):
+    account_type = fields.String(required=True,
+        error_messages={'required' : 'account_type is a required field'}
+    )
     public_token = fields.String(required=True,
         error_messages={'required' : 'public_token is a required field'}
     )
     account_id = fields.String(required=True,
         error_messages={'required' : 'account_id is a required field'}
     )
+    account_name = fields.String(required=True,
+        error_messages={'required' : 'account_name is a required field'}
+    )
     link_session_id = fields.String(required=True,
         error_messages={'required' : 'link_session_id is a required field'}
+    )
+    accounts = fields.String(required=True,
+        error_messages={'required' : 'accounts is a required field'}
+    )
+    institution_name = fields.String(required=True,
+        error_messages={'required' : 'institution_name is a required field'}
+    )
+    institution_id = fields.String(required=True,
+        error_messages={'required' : 'institution_id is a required field'}
     )
     #TODO: Finish filling these out
   
@@ -68,7 +83,6 @@ class AddAccountResource(Resource):
 
 def get_plaid_client():
     try:
-        current_app.logger.debug("Creating Plaid Client")
         client = Client(client_id=current_app.config.get('PLAID_CLIENT_ID'),
                         secret=current_app.config.get('PLAID_SECRET_KEY'),
                         public_key=current_app.config.get('PLAID_PUBLIC_KEY'),
@@ -100,15 +114,6 @@ def exchange_public_token(public_token):
                 'code' : '4002'
             }
         abort(400, message=response_object)
-
-def get_request_as_dict(request):
-    try:
-        request_as_dict = request.get_json()
-        current_app.logger.debug("Request JSON is: '{}'".format(request_as_dict))
-        return request_as_dict
-    except Exception as e:
-        current_app.logger.error("Error parsing request as json: {}".format(e))
-        abort(400, message="The supplied body was not valid JSON")
 
 
 def save_exchange_response_data(data):

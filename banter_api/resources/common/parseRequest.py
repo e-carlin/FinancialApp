@@ -9,7 +9,7 @@ def parse_request(request, schema):
         data = schema.loads(request.data)
         return data
     except ValidationError as err:
-        current_app.logger.debug("ValidationError thrown when parsing request. Error: {}".format(err))
+        current_app.logger.error("ValidationError thrown when parsing request. Error: {}".format(err))
         
         response_object = {
             'status' : '400',
@@ -18,7 +18,7 @@ def parse_request(request, schema):
         }
         abort(400, message=response_object)
     except JSONDecodeError as err:
-        current_app.logger.debug("JSONDevodeErrror thrown when parsing request. Error: {}".format(err))
+        current_app.logger.error("JSONDevodeErrror thrown when parsing request. Error: {}".format(err))
 
         response_object = {
             'status' : '400',
