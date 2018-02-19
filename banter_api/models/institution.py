@@ -12,10 +12,11 @@ class Institution(db.Model):
     plaid_item_id = db.Column(db.String(255), nullable=False)
     plaid_ins_id = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, name, access_token, item_id):
+    def __init__(self, name, access_token, plaid_item_id, plaid_ins_id):
         self.name = name
         self.access_token = access_token
-        self.item_id = item_id
+        self.plaid_item_id = plaid_item_id
+        self.plaid_ins_id = plaid_ins_id
 
     def __repr__(self):
-        return 'id: {}, name: {}'.format(self.id, self.name)
+        return 'id: {}, name: {}, plaid_item_id: {}, plaid_ins_id: {}'.format(self.id, self.name, self.plaid_item_id, self.plaid_ins_id)
