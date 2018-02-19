@@ -6,6 +6,8 @@ from flask import current_app
 from marshmallow import Schema, fields, ValidationError
 from banter_api.extensions import db
 from banter_api.resources.common.parseRequest import parse_request
+from banter_api.models.account import Account
+from banter_api.models.institution import Institution
 
 # from functools import wraps
 # def verify_jwt(f):
@@ -48,6 +50,7 @@ class AddAccountSchema(Schema):
     link_session_id = fields.String(required=True,
         error_messages={'required' : 'link_session_id is a required field'}
     )
+    # TODO: We should make a nested schema to validate the fields in the accounts object
     accounts = fields.String(required=True,
         error_messages={'required' : 'accounts is a required field'}
     )
