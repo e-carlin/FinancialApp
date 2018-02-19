@@ -1,10 +1,8 @@
 from datetime import datetime, timezone 
 from flask import current_app
-from sqlalchemy import exc
 from banter_api.extensions import bcrypt, db
 
 class User(db.Model):
-    """ User Model for storing user related details """
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -22,33 +20,8 @@ class User(db.Model):
         return '[id: {}, email: {}'.format(self.id, self.email)
 
     @staticmethod
+    #TODO: this should probably be a @classmethod and we should be using self instead of creating a new user
     def save_user(email):
         user = User(email)
         db.session.add(user)
         db.session.commit()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

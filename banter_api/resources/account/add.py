@@ -57,7 +57,6 @@ class AddAccountSchema(Schema):
     institution_id = fields.String(required=True,
         error_messages={'required' : 'institution_id is a required field'}
     )
-    #TODO: Finish filling these out
   
 class AddAccountResource(Resource):
     # @verify_jwt
